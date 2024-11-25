@@ -28,6 +28,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
+    - name: Set executable permissions for Gradle wrapper
+      run: chmod +x ./gradlew
+
     - name: Build with Gradle
       run: ./gradlew assembleDebug
 
@@ -36,3 +39,4 @@ jobs:
       with:
         name: SignalReader-APK
         path: app/build/outputs/apk/debug/app-debug.apk
+        
