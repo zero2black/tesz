@@ -1,36 +1,36 @@
-name: Clone and Add TinyFileManager
+name: Clone luci-app-tinyfilemanager
 
 on:
-  workflow_dispatch:
-    # Manually trigger the workflow.
-    inputs:
-      branch:
-        description: "Branch to update"
-        required: true
-        default: "main"
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions UI
 
 jobs:
-  update-repo:
+  clone-and-commit:
     runs-on: ubuntu-latest
 
     steps:
     # Step 1: Checkout your repository
-    - name: Checkout tesz repository
+    - name: Checkout your repository
       uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.inputs.branch }}
 
-    # Step 2: Clone the external repository
-    - name: Clone luci-app-tinyfilemanager
+    # Step 2: Clone the target repository
+    - name: Clone luci-app-tinyfilemanager repository
       run: |
-        git clone https://github.com/muink/luci-app-tinyfilemanager.git temp-luci-app-tinyfilemanager
-        mv temp-luci-app-tinyfilemanager luci-app-tinyfm
+        git clone https://github.com/muink/luci-app-tinyfilemanager.git temp_repo
 
-    # Step 3: Add, commit, and push changes
+    # Step 3: Move contents to desired folder
+    - name: Move contents to luci-app-tinyfm
+      run: |
+        mkdir -p luci-app-tinyfm
+        mv temp_repo/* luci-app-tinyfm/
+        rm -rf temp_repo
+
+    # Step 4: Commit and push changes
     - name: Commit and push changes
+      env:
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git add luci-app-tinyfm
-        git commit -m "Add luci-app-tinyfm folder from luci-app-tinyfilemanager"
-        git push origin ${{ github.event.inputs.branch }}
+        git commit -m "Add luci-app-tinyfm from luci-app-tinyfilemanager"
+        git push origin HEAD
