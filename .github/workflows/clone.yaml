@@ -1,28 +1,34 @@
-name: Clone luci-app-tinyfilemanager
+name: Copy luci-app-tinyfilemanager
 
 on:
   push:
     branches:
-      - main
+      - main  # or the branch you want to trigger the action
 
 jobs:
-  clone_and_commit:
+  copy-repo:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout main repository
-      uses: actions/checkout@v3
+      # Step 1: Check out the repository
+      - name: Checkout the current repository
+        uses: actions/checkout@v3
 
-    - name: Clone luci-app-tinyfilemanager
-      run: |
-        git clone --depth=1 https://github.com/muink/luci-app-tinyfilemanager.git luci-app-tinyfm
+      # Step 2: Clone the external repository
+      - name: Clone luci-app-tinyfilemanager repository
+        run: git clone https://github.com/muink/luci-app-tinyfilemanager.git
 
-    - name: Commit and push changes
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add luci-app-tinyfm
-        git commit -m "Add luci-app-tinyfilemanager as luci-app-tinyfm"
-        git push origin main
+      # Step 3: Copy files into the luci-app-tinyfm folder
+      - name: Copy files to luci-app-tinyfm folder
+        run: |
+          mkdir -p luci-app-tinyfm
+          cp -r luci-app-tinyfilemanager/* luci-app-tinyfm/
+
+      # Step 4: Add, commit, and push the changes
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add luci-app-tinyfm/
+          git commit -m "Add luci-app-tinyfilemanager to luci-app-tinyfm folder"
+          git push origin main  # Push to the correct branch
