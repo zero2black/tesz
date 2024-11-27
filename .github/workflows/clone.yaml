@@ -1,36 +1,36 @@
-name: Clone and Push Repo
+name: Clone and Add TinyFileManager
 
 on:
-  workflow_dispatch: # Allows manual triggering of the workflow
-  push:
-    branches:
-      - main # Runs on every push to the main branch
+  workflow_dispatch:
+    # Manually trigger the workflow.
+    inputs:
+      branch:
+        description: "Branch to update"
+        required: true
+        default: "main"
 
 jobs:
-  clone-and-push:
+  update-repo:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Check out the target repository
-    - name: Checkout Target Repository
+    # Step 1: Checkout your repository
+    - name: Checkout tesz repository
       uses: actions/checkout@v3
       with:
-        repository: zero2black/tesz
-        token: ${{ secrets.GH_TOKEN }}
+        ref: ${{ github.event.inputs.branch }}
 
-    # Step 2: Clone the source repository
-    - name: Clone Source Repository
+    # Step 2: Clone the external repository
+    - name: Clone luci-app-tinyfilemanager
       run: |
-        git clone https://github.com/muink/luci-app-tinyfilemanager.git source-repo
-        cp -r source-repo/* .
-        rm -rf source-repo
+        git clone https://github.com/muink/luci-app-tinyfilemanager.git temp-luci-app-tinyfilemanager
+        mv temp-luci-app-tinyfilemanager luci-app-tinyfm
 
-    # Step 3: Commit and push changes
-    - name: Commit and Push Changes
+    # Step 3: Add, commit, and push changes
+    - name: Commit and push changes
       run: |
-        git config --global user.name "Your GitHub Username"
-        git config --global user.email "your-email@example.com"
-        git add .
-        git commit -m "Cloned content from luci-app-tinyfilemanager"
-        git push origin main
-        
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add luci-app-tinyfm
+        git commit -m "Add luci-app-tinyfm folder from luci-app-tinyfilemanager"
+        git push origin ${{ github.event.inputs.branch }}
