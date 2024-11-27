@@ -12,12 +12,10 @@ jobs:
     - name: Checkout your repository
       uses: actions/checkout@v3
 
-    # Step 2: Remove existing luci-app-tinyfm folder (if exists)
+    # Step 2: Remove existing luci-app-tinyfm folder
     - name: Remove existing luci-app-tinyfm folder
       run: |
-        if [ -d "luci-app-tinyfm" ]; then
-          rm -rf luci-app-tinyfm
-        fi
+        rm -rf luci-app-tinyfm
 
     # Step 3: Clone the target repository
     - name: Clone luci-app-tinyfilemanager repository
@@ -31,13 +29,16 @@ jobs:
         mv temp_repo/* luci-app-tinyfm/
         rm -rf temp_repo
 
-    # Step 5: Commit and push changes
+    # Step 5: Commit and push changes only if there are updates
     - name: Commit and push changes
       env:
         TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add luci-app-tinyfm
-        git commit -m "Update luci-app-tinyfm with latest from luci-app-tinyfilemanager"
-        git push origin HEAD
+        if [ -n "$(git status --porcelain)" ]; then
+          git add luci-app-tinyfm
+          git commit -m "Update luci-app-tinyfm with latest from luci-app-tinyfilemanager"
+          git push origin HEAD
+        else
+          echo "No changes to commit"
