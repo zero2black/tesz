@@ -1,4 +1,4 @@
-name: Copy luci-app-tinyfilemanager
+name: Copy luci-app-tinyfilemanagera
 
 on:
   push:
